@@ -1,0 +1,54 @@
+<!doctype html>
+<html>
+	<head>
+		<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+	</head>
+	<body>
+			<h1>Authorized</h1>
+			<div id="oauth">
+			</div>
+			<script id="oauth-template" type="text/x-handlebars-template">
+				<h2>oAuth info</h2>
+				<dl class="dl-horizontal">
+					<dt>Access token</dt><dd class="text-overflow">{{access_token}}</dd>
+					<dt>Refresh token</dt><dd class="text-overflow">{{refresh_token}}</dd>
+				</dl>
+			</script>
+			<p id = "resultId"></p>
+			<p id = "resultName"></p>
+			<button class="btn btn-default" id="obtain-new-token">Obtain new token using the refresh token</button>
+			<span id="analysis" class = "btn btn-primary"> Get Track Analisys</span>
+			<p id = "resultAnalysis"></p>
+
+			<div class = "row">
+				<div class = "col-md-10 col-md-offset-1">
+					<table id = "info" class="table table-bordered">
+						<thead>
+							<tr>
+								<th>id</th>
+								<th>Name</th>
+								<th>danceability</th>
+								<th>energy</th>
+								<th>key</th>
+								<th>loudness</th>
+								<th>mode</th>
+								<th>speechiness</th>
+								<th>acousticness</th>
+								<th>instrumentalness</th>
+								<th>liveness</th>
+								<th>valence</th>
+								<th>tempo</th>
+								<th>duration_ms</th>
+								<th>time_signature</th>
+							</tr>
+						</thead>
+						<tbody>
+						</tbody>
+					</table>
+				</div>
+			</div>
+	</body>
+	<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/2.0.0-alpha.1/handlebars.min.js"></script>
+	<script type="text/javascript" src="playlist.js"></script>
+</html>
