@@ -14,7 +14,7 @@ var cookieParser = require('cookie-parser');
 
 var client_id = 'a7f084730c164961a78208b6f4dfa2fa'; // Your client id
 var client_secret = '370de42f69324fbabe5c90aeade386fc'; // Your secret
-var redirect_uri = 'http://localhost:8888/demo'; // Your redirect uri
+var redirect_uri = 'http://localhost:8889/demo'; // Your redirect uri
 
 /**
  * Generates a random string containing numbers and letters
@@ -285,5 +285,5 @@ app.get('/getNextTracks',function(req, res){
 	});
 });
 
-console.log('Listening on 8888');
-app.listen(8888);
+console.log('Listening on 8889');
+app.listen(8889);

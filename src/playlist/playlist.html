@@ -16,15 +16,19 @@
 			</script>
 			<p id = "resultId"></p>
 			<p id = "resultName"></p>
+			<input placeholder="Track Id" id="trackid"></input>
+			<span id="analysis_track" class = "btn btn-default"> Get Track Analisys</span>
+			<span id="my_playlist" class = "btn btn-default"> Get my Playlist</span>
 			<button class="btn btn-default" id="obtain-new-token">Obtain new token using the refresh token</button>
-			<span id="analysis" class = "btn btn-primary"> Get Track Analisys</span>
+			<span id="analysis" class = "btn btn-primary"> Get playlist Analisys</span>
 			<p id = "resultAnalysis"></p>
 
 			<div class = "row">
-				<div class = "col-md-10 col-md-offset-1">
+				<div class = "col-md-12">
 					<table id = "info" class="table table-bordered">
 						<thead>
 							<tr>
+								<th>#</th>
 								<th>id</th>
 								<th>Name</th>
 								<th>danceability</th>
@@ -42,7 +46,7 @@
 								<th>time_signature</th>
 							</tr>
 						</thead>
-						<tbody>
+						<tbody id = "info_body">
 						</tbody>
 					</table>
 				</div>

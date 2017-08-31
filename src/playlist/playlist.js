@@ -1,7 +1,4 @@
 class Controller {
-	doAlert(){
-		alert("HOLA")
-	}
 
 	refresh_token(acc_token, ref_token){
 		$.ajax({
@@ -37,7 +34,7 @@ class Controller {
 	}
 
 	track_analysis(acc_token) {
-		var trackId = $("#resultId").text();
+		var trackId = $("#trackid")[0].value;
 		$.ajax({
 			url: '/getAnalysis',
 			data: {
@@ -46,7 +43,8 @@ class Controller {
 			}
 		}).done(function(data) {
 			var info = [
-				"trackid",
+				0,
+				data.id,
 				"Name",
 				data.danceability,
 				data.energy,
@@ -67,7 +65,7 @@ class Controller {
 			var tableRef = document.getElementById('info').getElementsByTagName('tbody')[0];
 			var newRow   = tableRef.insertRow(tableRef.rows.length);
 
-			for(var i = 0; i < 15; ++i) {
+			for(var i = 0; i < 16; ++i) {
 				var cell = newRow.insertCell(i);
 				cell.appendChild(document.createTextNode(info[i]));
 			}
@@ -88,6 +86,7 @@ class Controller {
 			var trackNames = []
 			var items = data.tracks.items
 			var sTrackIds = "";
+			var arrTracks = [];
 
 			var resultNamePlaceholder = document.getElementById('resultName');
 			resultNamePlaceholder.innerHTML = JSON.stringify(data.tracks.next);
@@ -108,7 +107,8 @@ class Controller {
 					data: {
 						'access_token': acc_token,
 						'url': url
-					}
+					},
+					async: false
 				}).done(function(data) {
 					var resultIdPlaceholder = document.getElementById('resultId');
 					resultIdPlaceholder.innerHTML = JSON.stringify(data.next);
@@ -118,46 +118,59 @@ class Controller {
 						trackNames.push(items[it].track.name);
 						sTrackIds = sTrackIds + items[it].track.id + ","
 					}
-					next = data.tracks.next;
+					next = data.next;
 				});
 			}
 
-			$.ajax({
-				url: '/getMultiAnalysis',
-				data: {
-					'access_token': acc_token,
-					'trackIds': sTrackIds//JSON.stringify(trackIds)
-				}
-			}).done(function(data) {
-				var tableRef = document.getElementById('info').getElementsByTagName('tbody')[0];
+			$("#info_body tr").remove();
 
-				var features = data.audio_features;
-				for(var it in features) {
-					var info = [];
-					info.push(features[it].id);
-					info.push(trackNames[it]);
-					info.push(features[it].danceability);
-					info.push(features[it].energy);
-					info.push(features[it].key);
-					info.push(features[it].loudness);
-					info.push(features[it].mode);
-					info.push(features[it].speechiness);
-					info.push(features[it].acousticness);
-					info.push(features[it].instrumentalness);
-					info.push(features[it].liveness);
-					info.push(features[it].valence);
-					info.push(features[it].tempo);
-					info.push(features[it].duration_ms);
-					info.push(features[it].time_signature);
-
-					var newRow   = tableRef.insertRow(tableRef.rows.length);
-					for(var i = 0; i < 15; ++i) {
-						var cell = newRow.insertCell(i);
-						cell.appendChild(document.createTextNode(info[i]));
+			for(var b = 0; b < trackIds.length; ){
+				sTrackIds = "";
+				for(var it = 0; it < 100; ++it) {
+					if(b + it >= trackIds.length) {
+						break;
 					}
+					sTrackIds = sTrackIds + trackIds[b + it] + ",";
 				}
+				b += 100;
 
-			});
+				$.ajax({
+					url: '/getMultiAnalysis',
+					data: {
+						'access_token': acc_token,
+						'trackIds': sTrackIds//JSON.stringify(trackIds)
+					},
+					async: false
+				}).done(function(data) {
+					var tableRef = document.getElementById('info').getElementsByTagName('tbody')[0];
+					var features = data.audio_features;
+					for(var it in features) {
+						var info = [];
+						info.push((b - 100) + parseInt(it));
+						info.push(trackIds[it]);
+						info.push(trackNames[it]);
+						info.push(features[it].danceability);
+						info.push(features[it].energy);
+						info.push(features[it].key);
+						info.push(features[it].loudness);
+						info.push(features[it].mode);
+						info.push(features[it].speechiness);
+						info.push(features[it].acousticness);
+						info.push(features[it].instrumentalness);
+						info.push(features[it].liveness);
+						info.push(features[it].valence);
+						info.push(features[it].tempo);
+						info.push(features[it].duration_ms);
+						info.push(features[it].time_signature);
+
+						var newRow   = tableRef.insertRow(tableRef.rows.length);
+						for(var i = 0; i < 16; ++i) {
+							var cell = newRow.insertCell(i);
+							cell.appendChild(document.createTextNode(info[i]));
+						}
+					}
+				});
+			}
 		});
 	}
 }
@@ -203,11 +216,15 @@ $(() => {
 
 	var controller = new Controller();
 	$('#obtain-new-token').click(() => {
-		//controller.refresh_token(access_token, refresh_token);
-		controller.info_playlist(access_token);
+		controller.refresh_token(access_token, refresh_token);
+		//controller.info_playlist(access_token);
 	});
 
 	$('#analysis').click(() => {
 		controller.track_multi_analysis(access_token);
+	});
+
+	$('#analysis_track').click(() => {
+		controller.track_analysis(access_token);
 	});
 });
