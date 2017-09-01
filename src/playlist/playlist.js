@@ -257,6 +257,22 @@ $(() => {
 		return hashParams;
 	}
 
+	if (window.opener) {
+	    alert('inside a pop-up window or target=_blank window');
+		var params = getHashParams();
+		var access_token = params.access_token,
+			refresh_token = params.refresh_token,
+			error = params.error;
+		localStorage.setItem('sp-accessToken', access_token);
+		localStorage.setItem('sp-refreshToken', refresh_token);
+		localStorage.setItem('sp-error', error);
+		window.close()
+	} else if (window.top !== window.self) {
+	    alert('inside an iframe');
+	} else {
+	    alert('this is a top level window');
+	}
+
 	var oauthSource = document.getElementById('oauth-template').innerHTML,
 		oauthTemplate = Handlebars.compile(oauthSource),
 		oauthPlaceholder = document.getElementById('oauth');
@@ -265,7 +281,7 @@ $(() => {
 
 	var access_token = params.access_token,
 		refresh_token = params.refresh_token,
-		error = params.error;
+		error = null;
 
 	if (error) {
 		alert('There was an error during the authentication');

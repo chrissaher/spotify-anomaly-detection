@@ -11,6 +11,7 @@ var express = require('express'); // Express web server framework
 var request = require('request'); // "Request" library
 var querystring = require('querystring');
 var cookieParser = require('cookie-parser');
+var localStorage = require('localStorage')
 
 var client_id = 'a7f084730c164961a78208b6f4dfa2fa'; // Your client id
 var client_secret = '370de42f69324fbabe5c90aeade386fc'; // Your secret
@@ -38,6 +39,8 @@ var app = express();
 console.log(__dirname);
 app.use(express.static(__dirname, {'index': ['index.html', 'login.html']}))
    .use(cookieParser());
+
+app.use(express.static(__dirname + '/public'));
 
 app.get('/login', function(req, res) {
 
@@ -147,7 +150,6 @@ app.get('/demo', function(req, res) {
 	var code = req.query.code || null;
 	var state = req.query.state || null;
 	var storedState = req.cookies ? req.cookies[stateKey] : null;
-
 	if (state === null || state !== storedState) {
 		res.redirect('/#' +
 			querystring.stringify({
@@ -167,13 +169,13 @@ app.get('/demo', function(req, res) {
 			},
 			json: true
 		};
-
 		request.post(authOptions, function(error, response, body) {
 			if (!error && response.statusCode === 200) {
 
 				var access_token = body.access_token,
 					refresh_token = body.refresh_token;
-
+				localStorage.setItem('sp-accessToken', access_token);
+				localStorage.setItem('sp-refreshToken', refresh_token);
 				var options = {
 					url: 'https://api.spotify.com/v1/me',
 					headers: { 'Authorization': 'Bearer ' + access_token },
@@ -199,6 +201,29 @@ app.get('/demo', function(req, res) {
 			}
 		});
 	}
+});
+
+app.get('/dashboard',function(req, res){
+	console.log("DASH")
+	var access_token = req.query.access_token;
+	var refresh_token = req.query.refresh_token;
+	var error = req.query.error;
+	console.log(access_token)
+/*
+	request.get(null, function(error, response, body) {
+		console.log(body);
+
+	});*/
+
+	var url = '/playlist/playlist.html#' +
+		querystring.stringify({
+			access_token: access_token,
+			refresh_token: refresh_token
+		});
+
+	console.log(url)
+	res.redirect(url);
+
 });
 
 app.get('/getPlaylist',function(req, res){
