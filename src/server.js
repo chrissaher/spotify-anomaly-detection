@@ -45,7 +45,7 @@ app.get('/login', function(req, res) {
 	res.cookie(stateKey, state);
 
 	// your application requests authorization
-	var scope = 'user-read-private user-read-email';
+	var scope = 'user-read-private user-read-email playlist-read-private playlist-read-collaborative';
 	res.redirect('https://accounts.spotify.com/authorize?' +
 		querystring.stringify({
 			response_type: 'code',
@@ -99,7 +99,7 @@ app.get('/callback', function(req, res) {
 
 				// use the access token to access the Spotify Web API
 				request.get(options, function(error, response, body) {
-					console.log(body);
+					//console.log(body);
 				});
 
 				// we can also pass the token to the browser to make requests from there
@@ -144,9 +144,6 @@ app.get('/refresh_token', function(req, res) {
 
 app.get('/demo', function(req, res) {
 
-	// your application requests refresh and access tokens
-	// after checking the state parameter
-
 	var code = req.query.code || null;
 	var state = req.query.state || null;
 	var storedState = req.cookies ? req.cookies[stateKey] : null;
@@ -185,7 +182,7 @@ app.get('/demo', function(req, res) {
 
 				// use the access token to access the Spotify Web API
 				request.get(options, function(error, response, body) {
-					console.log(body);
+					//console.log(body);
 				});
 
 				// we can also pass the token to the browser to make requests from there
@@ -206,8 +203,12 @@ app.get('/demo', function(req, res) {
 
 app.get('/getPlaylist',function(req, res){
 	var access_token = req.query.access_token;
+	var user_id = req.query.user_id;
+	var playlist_id = req.query.playlist_id;
+	console.log(user_id);
+	console.log(playlist_id);
 	var authOptions = {
-		url: 'https://api.spotify.com/v1/users/chrissaher/playlists/2z6IPqUpF5TGe3uSkP33Kg',
+		url: 'https://api.spotify.com/v1/users/'+ user_id +'/playlists/' + playlist_id,
 		headers: { 'Authorization': 'Bearer ' + access_token },
 		form: {
 		},
@@ -237,7 +238,6 @@ app.get('/getAnalysis',function(req, res){
 	};
 
 	request.get(authOptions, function(error, response, body) {
-		console.log(body);
 		if (!error && response.statusCode === 200) {
 			res.send(body);
 		}
@@ -268,7 +268,6 @@ app.get('/getMultiAnalysis',function(req, res){
 app.get('/getNextTracks',function(req, res){
 	var access_token = req.query.access_token;
 	var url = req.query.url;
-	console.log(url)
 	var authOptions = {
 		url: url,
 		headers: { 'Authorization': 'Bearer ' + access_token },
@@ -279,10 +278,44 @@ app.get('/getNextTracks',function(req, res){
 
 	request.get(authOptions, function(error, response, body) {
 		if (!error && response.statusCode === 200) {
-			var id = body.id;
 			res.send(body);
 		}
 	});
+});
+
+app.get('/getCurrentUserPlaylist',function(req, res){
+	var access_token = req.query.access_token;
+	var authOptions = {
+		url: 'https://api.spotify.com/v1/me/playlists',
+		headers: { 'Authorization': 'Bearer ' + access_token },
+		form: {
+		},
+		json: true
+	};
+	request.get(authOptions, function(error, response, body) {
+		if (!error && response.statusCode === 200) {
+			res.send(body);
+		}
+	});
+});
+
+app.get('/getCurrentUserInfo',function(req, res){
+	var access_token = req.query.access_token;
+	var authOptions = {
+		url: 'https://api.spotify.com/v1/me',
+		headers: { 'Authorization': 'Bearer ' + access_token },
+		json: true
+	};
+
+	request.get(authOptions, function(error, response, body) {
+		if (!error && response.statusCode === 200) {
+			res.send({
+				'user_id': body.id,
+				'user_name': body.email
+			});
+		}
+	});
+
 });
 
 console.log('Listening on 8889');

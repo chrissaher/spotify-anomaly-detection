@@ -61,7 +61,7 @@ class Controller {
 				data.time_signature
 			];
 
-
+			$("#info_body tr").remove();
 			var tableRef = document.getElementById('info').getElementsByTagName('tbody')[0];
 			var newRow   = tableRef.insertRow(tableRef.rows.length);
 
@@ -74,12 +74,14 @@ class Controller {
 		});
 	}
 
-	track_multi_analysis(acc_token) {
+	track_multi_analysis(acc_token, user_id, playlist_id) {
 
 		$.ajax({
 			url: '/getPlaylist',
 			data: {
-				'access_token': acc_token
+				'access_token': acc_token,
+				'user_id': user_id,
+				'playlist_id': playlist_id
 			}
 		}).done(function(data) {
 			var trackIds = [];
@@ -173,6 +175,74 @@ class Controller {
 			}
 		});
 	}
+
+	my_playlist(acc_token) {
+		$.ajax({
+			url: '/getCurrentUserPlaylist',
+			data: {
+				'access_token': acc_token
+			}
+		}).done(function(data) {
+
+			$("#playlist_body tr").remove();
+
+			var items = data.items
+			var tableRef = document.getElementById('playlist').getElementsByTagName('tbody')[0];
+
+			for(var it in items) {
+				var item = items[it];
+				var playlist = [];
+				playlist.push(it);
+				playlist.push(item.id);
+				playlist.push(item.name);
+				playlist.push(item.owner.id);
+				playlist.push(item.href);
+
+				var newRow   = tableRef.insertRow(tableRef.rows.length);
+				for(var i = 0; i < 5; ++i) {
+					var cell = newRow.insertCell(i);
+					cell.appendChild(document.createTextNode(playlist[i]));
+				}
+				var cell = newRow.insertCell(5);
+				var optSpan = document.createElement('span');
+				optSpan.innerHTML = "Analyze";
+				optSpan.className = "btn btn-default";
+
+				var optA = document.createElement('a');
+
+				optA.setAttribute("playlist_id", item.id);
+				optA.setAttribute("user_id", item.owner.id);
+				optA.appendChild(optSpan);
+				optA.onclick = function(){
+					var c = new Controller();
+					c.track_multi_analysis(acc_token, this.getAttribute("user_id"), this.getAttribute("playlist_id"));
+				};
+
+				cell.appendChild(optA);
+			}
+
+		});
+	}
+
+	my_info(acc_token) {
+		$.ajax({
+			url: '/getCurrentUserInfo',
+			data: {
+				'access_token': acc_token
+			}
+		}).done(function(data) {
+
+			$("#playlist_body tr").remove();
+			var user_id = data.user_id;
+			var user_name = data.user_name;
+
+			var userIdComponent = document.getElementById('user_id');
+			userIdComponent.innerHTML = user_id;
+
+			var userNameComponent = document.getElementById('user_name');
+			userNameComponent.innerHTML = user_name;
+		});
+	}
 }
 
 $(() => {
@@ -215,6 +285,8 @@ $(() => {
 
 
 	var controller = new Controller();
+	controller.my_info(access_token);
+
 	$('#obtain-new-token').click(() => {
 		controller.refresh_token(access_token, refresh_token);
 		//controller.info_playlist(access_token);
@@ -226,5 +298,9 @@ $(() => {
 
 	$('#analysis_track').click(() => {
 		controller.track_analysis(access_token);
+	});
+
+	$('#my_playlist').click(() => {
+		controller.my_playlist(access_token);
 	});
 });

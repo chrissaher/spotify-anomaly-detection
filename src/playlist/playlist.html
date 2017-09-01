@@ -5,6 +5,8 @@
 	</head>
 	<body>
 			<h1>Authorized</h1>
+			<h4>Id: <span id="user_id"></span></h4>
+			<h4>Name: <span id="user_name"></span></h4>
 			<div id="oauth">
 			</div>
 			<script id="oauth-template" type="text/x-handlebars-template">
@@ -14,6 +16,7 @@
 					<dt>Refresh token</dt><dd class="text-overflow">{{refresh_token}}</dd>
 				</dl>
 			</script>
+			<br />
 			<p id = "resultId"></p>
 			<p id = "resultName"></p>
 			<input placeholder="Track Id" id="trackid"></input>
@@ -47,6 +50,25 @@
 							</tr>
 						</thead>
 						<tbody id = "info_body">
+						</tbody>
+					</table>
+				</div>
+			</div>
+
+			<div class = "row">
+				<div class = "col-md-8">
+					<table id = "playlist" class="table table-bordered">
+						<thead>
+							<tr>
+								<th>#</th>
+								<th>id</th>
+								<th>Name</th>
+								<th>owner</th>
+								<th>href</th>
+								<th>Option</th>
+							</tr>
+						</thead>
+						<tbody id = "playlist_body">
 						</tbody>
 					</table>
 				</div>
