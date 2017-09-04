@@ -148,9 +148,10 @@ class Controller {
 					var features = data.audio_features;
 					for(var it in features) {
 						var info = [];
-						info.push((b - 100) + parseInt(it));
-						info.push(trackIds[it]);
-						info.push(trackNames[it]);
+						var itx = (b - 100) + parseInt(it);
+						info.push(itx);
+						info.push(trackIds[itx]);
+						info.push(trackNames[itx]);
 						info.push(features[it].danceability);
 						info.push(features[it].energy);
 						info.push(features[it].key);
