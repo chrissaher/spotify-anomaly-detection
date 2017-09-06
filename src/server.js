@@ -336,7 +336,12 @@ app.get('/getCurrentUserInfo',function(req, res){
 		if (!error && response.statusCode === 200) {
 			res.send({
 				'user_id': body.id,
-				'user_name': body.email
+				'user_name': body.display_name || body.id,
+				'user_country': body.country,
+				'user_image': ((body.images.length > 0)? body.images[0].url : null),
+				'user_mail' : body.email,
+				'user_url' : body.external_urls["spotify"],
+				'user_followers' : body.followers.total
 			});
 		}
 	});

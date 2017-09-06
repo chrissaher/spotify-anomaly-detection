@@ -16,6 +16,7 @@
   "dependencies": {
     "cookie-parser": "1.4.3",
     "express": "4.15.4",
+    "flag-icon-css": "2.8.0",
     "querystring": "0.2.0",
     "request": "2.81.0"
   }

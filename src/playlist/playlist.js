@@ -186,9 +186,12 @@ class Controller {
 		}).done(function(data) {
 
 			$("#playlist_body tr").remove();
+			$("#lstPlaylist tr").remove();
 
+			var template = '<tr> <td class="v-a-m">#It </td> <td class="v-a-m"><span class="text-white">#Name</span> <br> <span>Followers: #Followers</span> </td> <td class="v-a-m"> <div class="media media-auto"> <div class="media-left"> <div class="avatar"> <img class="media-object img-circle" src="#OwnerImg" alt="Avatar"> </div> </div> <div class="media-body"> <span class="media-heading text-white">#OwnerName</span> <br> <span class="media-heading"><span>Spotify id: #OwnerId</span></span> </div> </div> </td> <td class="v-a-m"><span>#Tipe</span> <br> <span class="#CollaborativeStyle">#Collaborative</span> </td> <td class="text-right v-a-m"> <a href = "#AnalyzeURL" data-user = "#DataUser" data-playlist = "#DataPlaylist" type="button" class="btn btn-default">Analyze</a> </td> </tr> ';
 			var items = data.items
 			var tableRef = document.getElementById('playlist').getElementsByTagName('tbody')[0];
+			var myTable = document.getElementById('lstPlaylist');
 
 			for(var it in items) {
 				var item = items[it];
@@ -220,6 +223,14 @@ class Controller {
 				};
 
 				cell.appendChild(optA);
+				var current = template.replace("#It", it );
+				current = current.replace("#Name", item.name);
+				current = current.replace("#OwnerName", item.owner.display_name || item.owner.id);
+				current = current.replace("#OwnerId", item.owner.id);
+				current = current.replace("#Collaborative", (item.collaborative)? "Collaborative":"Not Collaborative" );
+				current = current.replace("#DataUser", item.owner.id);
+				current = current.replace("#DataPlaylist", item.id);
+				myTable.insertAdjacentHTML( 'beforeend', current );
 			}
 
 		});
@@ -234,14 +245,26 @@ class Controller {
 		}).done(function(data) {
 
 			$("#playlist_body tr").remove();
-			var user_id = data.user_id;
-			var user_name = data.user_name;
 
-			var userIdComponent = document.getElementById('user_id');
-			userIdComponent.innerHTML = user_id;
+			var userId = document.getElementById('user_id');
+			userId.innerHTML = data.user_id;
 
-			var userNameComponent = document.getElementById('user_name');
-			userNameComponent.innerHTML = user_name;
+			var userName = document.getElementById('user_name');
+			userName.innerHTML = data.user_name;
+
+			var spotifyIcon = document.getElementById('spotify_link');
+			spotifyIcon.href = data.user_url;
+
+			var userFlag = document.getElementById('user_flag');
+			userFlag.className = "avatar-status avatar-status-bottom flag-icon flag-icon-" + data.user_country.toLowerCase() + " flag-icon-squared";
+
+			if(data.user_image != null) {
+				var userImg = document.getElementById('user_image');
+				userImg.src = data.user_image;
+			}
+
+			var user_followers = document.getElementById('user_followers');
+			user_followers.innerHTML = data.user_followers;
 		});
 	}
 }
@@ -267,11 +290,11 @@ $(() => {
 		localStorage.setItem('sp-accessToken', access_token);
 		localStorage.setItem('sp-refreshToken', refresh_token);
 		localStorage.setItem('sp-error', error);
-		window.close()
+		//window.close()
 	} else if (window.top !== window.self) {
-	    alert('inside an iframe');
+	    //alert('inside an iframe');
 	} else {
-	    alert('this is a top level window');
+	    //alert('this is a top level window');
 	}
 
 	var oauthSource = document.getElementById('oauth-template').innerHTML,
