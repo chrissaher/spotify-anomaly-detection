@@ -76,163 +76,143 @@ class Controller {
 
 	track_multi_analysis(acc_token, user_id, playlist_id) {
 
-		$.ajax({
-			url: '/getPlaylist',
-			data: {
-				'access_token': acc_token,
-				'user_id': user_id,
-				'playlist_id': playlist_id
-			}
-		}).done(function(data) {
-			var trackIds = [];
-			var trackNames = []
-			var items = data.tracks.items
-			var sTrackIds = "";
-			var arrTracks = [];
+		var next = "";
+		var map = new Map();
+		var sTrackIds = "";
+		while(next != null) {
+			$.ajax({
+				url: '/getPlaylistTracks',
+				data: {
+					'access_token': acc_token,
+					'user_id': user_id,
+					'playlist_id': playlist_id,
+					'url' : next,
+					'fields':	'next,' +
+								'total,' +
+								'items(track(id,name))'
+				},
+				async: false
+			}).done(function(data) {
+				next = data.next;
 
-			var resultNamePlaceholder = document.getElementById('resultName');
-			resultNamePlaceholder.innerHTML = JSON.stringify(data.tracks.next);
-
-
-			for(var it in items) {
-				trackIds.push(items[it].track.id);
-				trackNames.push(items[it].track.name);
-				sTrackIds = sTrackIds + items[it].track.id + ","
-			}
-
-			var next = data.tracks.next;
-			while(next != null) {
-				var url = next;
-				next = null;
-				$.ajax({
-					url: '/getNextTracks',
-					data: {
-						'access_token': acc_token,
-						'url': url
-					},
-					async: false
-				}).done(function(data) {
-					var resultIdPlaceholder = document.getElementById('resultId');
-					resultIdPlaceholder.innerHTML = JSON.stringify(data.next);
-					var items = data.items
-					for(var it in items) {
-						trackIds.push(items[it].track.id);
-						trackNames.push(items[it].track.name);
-						sTrackIds = sTrackIds + items[it].track.id + ","
-					}
-					next = data.next;
-				});
-			}
-
-			$("#info_body tr").remove();
-
-			for(var b = 0; b < trackIds.length; ){
-				sTrackIds = "";
-				for(var it = 0; it < 100; ++it) {
-					if(b + it >= trackIds.length) {
-						break;
-					}
-					sTrackIds = sTrackIds + trackIds[b + it] + ",";
+				for(var it in data.items) {
+					var curr = data.items[it].track;
+					map.set(curr.id, curr.name);
+					sTrackIds = sTrackIds + curr.id + ","
 				}
-				b += 100;
 
-				$.ajax({
-					url: '/getMultiAnalysis',
-					data: {
-						'access_token': acc_token,
-						'trackIds': sTrackIds//JSON.stringify(trackIds)
-					},
-					async: false
-				}).done(function(data) {
-					var tableRef = document.getElementById('info').getElementsByTagName('tbody')[0];
-					var features = data.audio_features;
-					for(var it in features) {
-						var info = [];
-						var itx = (b - 100) + parseInt(it);
-						info.push(itx);
-						info.push(trackIds[itx]);
-						info.push(trackNames[itx]);
-						info.push(features[it].danceability);
-						info.push(features[it].energy);
-						info.push(features[it].key);
-						info.push(features[it].loudness);
-						info.push(features[it].mode);
-						info.push(features[it].speechiness);
-						info.push(features[it].acousticness);
-						info.push(features[it].instrumentalness);
-						info.push(features[it].liveness);
-						info.push(features[it].valence);
-						info.push(features[it].tempo);
-						info.push(features[it].duration_ms);
-						info.push(features[it].time_signature);
+				if(data.total >= map.size) {
+					alert("Reached Total: " + map.size )
+				}
+			});
+		}
 
-						var newRow   = tableRef.insertRow(tableRef.rows.length);
-						for(var i = 0; i < 16; ++i) {
-							var cell = newRow.insertCell(i);
-							cell.appendChild(document.createTextNode(info[i]));
-						}
-					}
-				});
-			}
-		});
 	}
 
-	my_playlist(acc_token) {
+	my_playlist(acc_token, limit, offset) {
 		$.ajax({
 			url: '/getCurrentUserPlaylist',
 			data: {
-				'access_token': acc_token
+				'access_token': acc_token,
+				'limit': limit,
+				'offset': offset
 			}
 		}).done(function(data) {
 
-			$("#playlist_body tr").remove();
+			self.total = data.total
+			if(offset + limit >= data.total) {
+				document.getElementById("next").parentNode.className = "disabled";
+			} else {
+				document.getElementById("next").parentNode.className = "";
+			}
 			$("#lstPlaylist tr").remove();
 
-			var template = '<tr> <td class="v-a-m">#It </td> <td class="v-a-m"><span class="text-white">#Name</span> <br> <span>Followers: #Followers</span> </td> <td class="v-a-m"> <div class="media media-auto"> <div class="media-left"> <div class="avatar"> <img class="media-object img-circle" src="#OwnerImg" alt="Avatar"> </div> </div> <div class="media-body"> <span class="media-heading text-white">#OwnerName</span> <br> <span class="media-heading"><span>Spotify id: #OwnerId</span></span> </div> </div> </td> <td class="v-a-m"><span>#Tipe</span> <br> <span class="#CollaborativeStyle">#Collaborative</span> </td> <td class="text-right v-a-m"> <a href = "#AnalyzeURL" data-user = "#DataUser" data-playlist = "#DataPlaylist" type="button" class="btn btn-default">Analyze</a> </td> </tr> ';
+			var template = '<tr> <td class="v-a-m">#It </td> <td class="v-a-m"><a href = "#URL"><span class="text-white">#Name</span></a> <br> <span>Followers: #Followers</span> </td> <td class="v-a-m"> <div class="media media-auto"> <div class="media-left"> <div class="avatar"> <img class="media-object img-circle" src="#OwnerImg" alt="Avatar"> </div> </div> <div class="media-body"> <span class="media-heading text-white">#OwnerName</span> <br> <span class="media-heading"><span>Spotify id: #OwnerId</span></span> </div> </div> </td> <td class="v-a-m"><span>#Tipe</span> <br> <span class="#CollaborativeStyle">#sCollaborative</span> </td> <td class="text-right v-a-m"> <a  id ="#GETID" data-user = "#DataUser" data-playlist = "#DataPlaylist" type="button" class="btn btn-default">Analyze</a> </td> </tr>';
 			var items = data.items
-			var tableRef = document.getElementById('playlist').getElementsByTagName('tbody')[0];
+			//var tableRef = document.getElementById('playlist').getElementsByTagName('tbody')[0];
 			var myTable = document.getElementById('lstPlaylist');
-
+			var idx = 1;
 			for(var it in items) {
+			//for(var it = 0; it < 1; ++it) {
 				var item = items[it];
-				var playlist = [];
-				playlist.push(it);
-				playlist.push(item.id);
-				playlist.push(item.name);
-				playlist.push(item.owner.id);
-				playlist.push(item.href);
 
-				var newRow   = tableRef.insertRow(tableRef.rows.length);
-				for(var i = 0; i < 5; ++i) {
-					var cell = newRow.insertCell(i);
-					cell.appendChild(document.createTextNode(playlist[i]));
-				}
-				var cell = newRow.insertCell(5);
-				var optSpan = document.createElement('span');
-				optSpan.innerHTML = "Analyze";
-				optSpan.className = "btn btn-default";
+				$.ajax({
+					url: '/getPlaylistFull',
+					data: {
+						'access_token': acc_token,
+						'user_id': item.owner.id,
+						'playlist_id': item.id,
+						'fields': 	'name,' +
+									'id,' +
+									'external_urls.spotify,' +
+									'owner,' +
+									'owner.display_name,' +
+									'owner.id,' +
+									'collaborative,' +
+									'public,' +
+									'followers.total,' +
+									'images.items(url),'
+					}
+				}).done(function(data2) {
 
-				var optA = document.createElement('a');
+					var current = template.replace("#It", idx);
+					current = current.replace("#Name", data2.name);
+					current = current.replace("#URL", data2.external_urls.spotify);
+					current = current.replace("#OwnerName", data2.owner.display_name || data2.owner.id);
+					if(data2.owner != null) {
+						var userImg = document.getElementById('user_image');
+						//userImg.src = data.user_image;
+					}
+					current = current.replace("#OwnerId", data2.owner.id);
+					if (data2.collaborative == true) {
+						current = current.replace("#CollaborativeStyle", "text-success");
+						current = current.replace("#sCollaborative", "Collaborative");
+					}
+					else {
+						current = current.replace("#CollaborativeStyle", "text-danger");
+						current = current.replace("#sCollaborative", "Not Collaborative");
+					}
+					current = current.replace("#Tipe", (data2.public == true)? "Public": "Private");
+					current = current.replace("#GETID", data2.id);
+					current = current.replace("#DataUser", data2.owner.id);
+					current = current.replace("#DataPlaylist", data2.id);
+					//current = current.replace("#OwnerImg", data2.images[1].url);
 
-				optA.setAttribute("playlist_id", item.id);
-				optA.setAttribute("user_id", item.owner.id);
-				optA.appendChild(optSpan);
-				optA.onclick = function(){
-					var c = new Controller();
-					c.track_multi_analysis(acc_token, this.getAttribute("user_id"), this.getAttribute("playlist_id"));
-				};
 
-				cell.appendChild(optA);
-				var current = template.replace("#It", it );
-				current = current.replace("#Name", item.name);
-				current = current.replace("#OwnerName", item.owner.display_name || item.owner.id);
-				current = current.replace("#OwnerId", item.owner.id);
-				current = current.replace("#Collaborative", (item.collaborative)? "Collaborative":"Not Collaborative" );
-				current = current.replace("#DataUser", item.owner.id);
-				current = current.replace("#DataPlaylist", item.id);
-				myTable.insertAdjacentHTML( 'beforeend', current );
+					current = current.replace("#Followers", data2.followers.total);
+
+					$.ajax({
+						url: '/getUserInfo',
+						data: {
+							'access_token': acc_token,
+							'user_id': data2.owner.id
+						},
+						async: false
+					}).done(function(UserInfo) {
+						if(UserInfo.images.length > 0) {
+							current = current.replace("#OwnerImg", UserInfo.images[0].url);
+						} else {
+							current = current.replace("#OwnerImg", "../public/img/spotify_logo.png");
+						}
+					});
+
+					myTable.insertAdjacentHTML( 'beforeend', current );
+					var current_get = document.getElementById(data2.id);
+					current_get.onclick = function(){
+						var c = new Controller();
+						c.track_multi_analysis(acc_token, this.getAttribute("data-user"), this.getAttribute("data-playlist"));
+					};
+
+					var c = $("#lstPlaylist tr").length;
+					if(c == self.total % self.limit){
+						//alert("FIN")
+						$("#playlist_loader").hide();
+						$("#playlist_table").show();
+					}
+				});
+
+				idx++;
 			}
-
 		});
 	}
 
@@ -248,6 +228,7 @@ class Controller {
 
 			var userId = document.getElementById('user_id');
 			userId.innerHTML = data.user_id;
+			self.current_user_id = data.user_id
 
 			var userName = document.getElementById('user_name');
 			userName.innerHTML = data.user_name;
@@ -296,10 +277,10 @@ $(() => {
 	} else {
 	    //alert('this is a top level window');
 	}
-
+/*
 	var oauthSource = document.getElementById('oauth-template').innerHTML,
 		oauthTemplate = Handlebars.compile(oauthSource),
-		oauthPlaceholder = document.getElementById('oauth');
+		oauthPlaceholder = document.getElementById('oauth');*/
 
 	var params = getHashParams();
 
@@ -312,10 +293,10 @@ $(() => {
 	} else {
 		if (access_token) {
 			// render oauth info
-			oauthPlaceholder.innerHTML = oauthTemplate({
+		/*	oauthPlaceholder.innerHTML = oauthTemplate({
 				access_token: access_token,
 				refresh_token: refresh_token
-			});
+			});*/
 
 		} else {
 				// render initial screen
@@ -323,9 +304,37 @@ $(() => {
 		}
 	}
 
-
 	var controller = new Controller();
+	self.limit = 20;
+	self.offset = 0;
+	self.total = 0;
+	var btnPrev = document.getElementById("prev");
+	btnPrev.onclick = function(){
+		var c = new Controller();
+		if(self.offset > 0) {
+			self.offset -= self.limit;
+			$("#playlist_loader").show();
+			$("#playlist_table").hide();
+			c.my_playlist(access_token, self.limit, self.offset);
+			if(self.offset == 0) {
+				this.parentNode.className  = "disabled";
+			}
+		}
+	};
+
+	var btnNext = document.getElementById("next");
+	btnNext.onclick = function(){
+		var c = new Controller();
+		document.getElementById("prev").parentNode.className  = "";
+		self.offset += self.limit;
+		$("#playlist_loader").show();
+		$("#playlist_table").hide();
+		c.my_playlist(access_token, self.limit, self.offset);
+	};
+
+
 	controller.my_info(access_token);
+	controller.my_playlist(access_token, self.limit, self.offset);
 
 	$('#obtain-new-token').click(() => {
 		controller.refresh_token(access_token, refresh_token);
@@ -341,6 +350,6 @@ $(() => {
 	});
 
 	$('#my_playlist').click(() => {
-		controller.my_playlist(access_token);
+		controller.my_playlist(access_token, 5, 0);
 	});
 });

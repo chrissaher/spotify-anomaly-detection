@@ -226,14 +226,57 @@ app.get('/dashboard',function(req, res){
 
 });
 
+app.get('/getPlaylistTracks',function(req, res){
+	var access_token = req.query.access_token;
+	var user_id = req.query.user_id;
+	var playlist_id = req.query.playlist_id;
+	var fields = req.query.fields;
+
+	var url = "";
+	
+	if(req.query.url != null) {
+		url = req.query.url;
+	} else {
+		url = 'https://api.spotify.com/v1/users/'+ user_id +'/playlists/' + playlist_id + '/tracks/?'+
+			querystring.stringify({
+				'fields' : fields
+			});
+	}
+
+	console.log(user_id);
+	console.log(playlist_id);
+	var authOptions = {
+		url: ,
+		headers: { 'Authorization': 'Bearer ' + access_token },
+		form: {
+		},
+		json: true
+	};
+
+	console.log('https://api.spotify.com/v1/users/'+ user_id +'/playlists/' + playlist_id + '/tracks/?'+
+		querystring.stringify({
+			'fields' : fields
+		}));
+	request.get(authOptions, function(error, response, body) {
+		if (!error && response.statusCode === 200) {
+			res.send(body);
+		}
+	});
+});
+
 app.get('/getPlaylist',function(req, res){
 	var access_token = req.query.access_token;
 	var user_id = req.query.user_id;
 	var playlist_id = req.query.playlist_id;
+	var fields = req.query.fields;
+
 	console.log(user_id);
 	console.log(playlist_id);
 	var authOptions = {
-		url: 'https://api.spotify.com/v1/users/'+ user_id +'/playlists/' + playlist_id,
+		url: 'https://api.spotify.com/v1/users/'+ user_id +'/playlists/' + playlist_id + +
+			querystring.stringify({
+				fields : fields
+			}),
 		headers: { 'Authorization': 'Bearer ' + access_token },
 		form: {
 		},
@@ -310,8 +353,10 @@ app.get('/getNextTracks',function(req, res){
 
 app.get('/getCurrentUserPlaylist',function(req, res){
 	var access_token = req.query.access_token;
+	var limit = req.query.limit;
+	var offset = req.query.offset;
 	var authOptions = {
-		url: 'https://api.spotify.com/v1/me/playlists',
+		url: 'https://api.spotify.com/v1/me/playlists?limit=' + limit + '&offset=' + offset,
 		headers: { 'Authorization': 'Bearer ' + access_token },
 		form: {
 		},
@@ -323,6 +368,53 @@ app.get('/getCurrentUserPlaylist',function(req, res){
 		}
 	});
 });
+
+app.get('/getPlaylistFull',function(req, res){
+	var access_token = req.query.access_token;
+	var user_id = req.query.user_id;
+	var playlist_id = req.query.playlist_id;
+	var fields = req.query.fields;
+	console.log(user_id);
+	console.log(playlist_id);
+	var authOptions = {
+		url: 'https://api.spotify.com/v1/users/' + user_id + '/playlists/' + playlist_id + '?fields=' + fields,
+		headers: { 'Authorization': 'Bearer ' + access_token },
+		form: {
+		},
+		json: true
+	};
+	console.log("HARO")
+	request.get(authOptions, function(error, response, body) {
+		if (!error && response.statusCode === 200) {
+			console.log(body)
+			/*res.send({
+				'followers': body.followers.total
+			});*/
+			res.send(body);
+		}
+	});
+	console.log("BYE BYE")
+});
+
+app.get('/getUserInfo',function(req, res){
+	var access_token = req.query.access_token;
+	var user_id = req.query.user_id;
+
+	var authOptions = {
+		url: 'https://api.spotify.com/v1/users/' + user_id ,
+		headers: { 'Authorization': 'Bearer ' + access_token },
+		json: true
+	};
+
+	request.get(authOptions, function(error, response, body) {
+		if (!error && response.statusCode === 200) {
+			res.send({
+				'images' : body.images
+			});
+		}
+	});
+});
+
 
 app.get('/getCurrentUserInfo',function(req, res){
 	var access_token = req.query.access_token;

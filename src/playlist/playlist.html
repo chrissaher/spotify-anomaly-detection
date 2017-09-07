@@ -8,6 +8,7 @@
 		<link rel="stylesheet" type="text/css" href="../public/css/app.css" />
 		<link rel="stylesheet" type="text/css" href="../public/css/plugins.css" />
 		<link rel="stylesheet" type="text/css" href="../public/css/flag-icons/css/flag-icon.min.css" />
+		<link rel="stylesheet" type="text/css" href="../public/css/loader.css" />
 	</head>
 	<body>
 			<script src="../public/vendor/js/lib.min.js"></script>
@@ -148,22 +149,77 @@
 									</div>
 
 
-
-
 								</div>
 								<!-- START Left Column -->
 								<div class="col-lg-8">
 
-								<div id="oauth">
-								</div>
-								<script id="oauth-template" type="text/x-handlebars-template">
-									<h2>oAuth info</h2>
-									<dl class="dl-horizontal">
-										<dt>Access token</dt><dd class="text-overflow">{{access_token}}</dd>
-										<dt>Refresh token</dt><dd class="text-overflow">{{refresh_token}}</dd>
-									</dl>
-								</script>
-								<br />
+									<!-- START Basic Example Table -->
+									<h4>My Playlist</h4>
+
+									<div id="playlist_loader" class="loader" style="left: 45%;margin-right: -50%;">
+									  <div class="loader__bar"></div>
+									  <div class="loader__bar"></div>
+									  <div class="loader__bar"></div>
+									  <div class="loader__bar"></div>
+									  <div class="loader__bar"></div>
+									  <div class="loader__ball"></div>
+									</div>
+									<table id="playlist_table" class="table" style="display:none">
+										<thead>
+											<tr>
+												<th class="small text-muted text-uppercase"><strong>#</strong>
+												</th>
+												<th class="small text-muted text-uppercase"><strong>Playlist</strong>
+												</th>
+												<th class="small text-muted text-uppercase"><strong>Owner</strong>
+												</th>
+												<th class="small text-muted text-uppercase"><strong>Type</strong>
+												</th>
+												<th class="small text-muted text-uppercase text-right"><strong>Actions</strong>
+												</th>
+											</tr>
+										</thead>
+										<tbody id = "lstPlaylist">
+											<tr>
+												<td class="v-a-m">1
+												</td>
+												<td class="v-a-m"><a href = "#URL"><span class="text-white">Alone</span></a>
+													<br>
+													<span>Followers: 150</span>
+												</td>
+												<td class="v-a-m">
+													<div class="media media-auto">
+														<div class="media-left">
+															<div class="avatar">
+																<img class="media-object img-circle" src="../public/img/spotify_logo.png" alt="Avatar">
+															</div>
+														</div>
+														<div class="media-body">
+															<span class="media-heading text-white">chrissaher</span>
+															<br>
+															<span class="media-heading"><span>Spotify id: chrissaher</span></span>
+														</div>
+													</div>
+												</td>
+												<td class="v-a-m"><span>Public</span>
+													<br>
+													<span class="text-danger">Collaborative</span>
+												</td>
+												<td class="text-right v-a-m">
+													<button type="button" class="btn btn-default">Analyze</button>
+												</td>
+											</tr>
+
+										</tbody>
+									</table>
+
+									<nav>
+										<ul class="pager">
+											<li><a id="prev">Previous</a></li>
+											<li><a id="next">Next</a></li>
+										</ul>
+									</nav>
+
 								<p id = "resultId"></p>
 								<p id = "resultName"></p>
 								<input placeholder="Track Id" id="trackid"></input>
@@ -173,58 +229,7 @@
 								<span id="analysis" class = "btn btn-primary"> Get playlist Analisys</span>
 								<p id = "resultAnalysis"></p>
 
-								<!-- START Basic Example Table -->
-								<h4 class="m-t-3">My Playlist</h4>
 
-								<table class="table">
-									<thead>
-										<tr>
-											<th class="small text-muted text-uppercase"><strong>#</strong>
-											</th>
-											<th class="small text-muted text-uppercase"><strong>Playlist</strong>
-											</th>
-											<th class="small text-muted text-uppercase"><strong>Owner</strong>
-											</th>
-											<th class="small text-muted text-uppercase"><strong>Type</strong>
-											</th>
-											<th class="small text-muted text-uppercase text-right"><strong>Actions</strong>
-											</th>
-										</tr>
-									</thead>
-									<tbody id = "lstPlaylist">
-										<tr>
-											<td class="v-a-m">1
-											</td>
-											<td class="v-a-m"><span class="text-white">Alone</span>
-												<br>
-												<span>Followers: 150</span>
-											</td>
-											<td class="v-a-m">
-												<div class="media media-auto">
-													<div class="media-left">
-														<div class="avatar">
-															<img class="media-object img-circle" src="../public/img/spotify_logo.png" alt="Avatar">
-														</div>
-													</div>
-													<div class="media-body">
-														<span class="media-heading text-white">chrissaher</span>
-														<br>
-														<span class="media-heading"><span>Spotify id: chrissaher</span></span>
-													</div>
-												</div>
-											</td>
-											<td class="v-a-m"><span>Public</span>
-												<br>
-												<span class="text-danger">Collaborative</span>
-											</td>
-											<td class="text-right v-a-m">
-												<button type="button" class="btn btn-default">Analyze</button>
-											</td>
-										</tr>
-
-									</tbody>
-								</table>
-								<!-- END Basic Example Table -->
 
 								<div class = "row">
 									<div class = "col-md-12">
