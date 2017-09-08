@@ -204,11 +204,11 @@ app.get('/demo', function(req, res) {
 });
 
 app.get('/dashboard',function(req, res){
-	console.log("DASH")
+	//console.log("DASH")
 	var access_token = req.query.access_token;
 	var refresh_token = req.query.refresh_token;
 	var error = req.query.error;
-	console.log(access_token)
+	//console.log(access_token)
 /*
 	request.get(null, function(error, response, body) {
 		console.log(body);
@@ -221,7 +221,7 @@ app.get('/dashboard',function(req, res){
 			refresh_token: refresh_token
 		});
 
-	console.log(url)
+	//console.log(url)
 	res.redirect(url);
 
 });
@@ -232,31 +232,28 @@ app.get('/getPlaylistTracks',function(req, res){
 	var playlist_id = req.query.playlist_id;
 	var fields = req.query.fields;
 
-	var url = "";
-	
-	if(req.query.url != null) {
-		url = req.query.url;
-	} else {
+	var url = req.query.url;
+
+	if(url == null || url == "") {
 		url = 'https://api.spotify.com/v1/users/'+ user_id +'/playlists/' + playlist_id + '/tracks/?'+
 			querystring.stringify({
 				'fields' : fields
 			});
 	}
 
+	console.log("PARAMETERS")
 	console.log(user_id);
 	console.log(playlist_id);
+	console.log(url)
+	console.log("END")
 	var authOptions = {
-		url: ,
+		url: url,
 		headers: { 'Authorization': 'Bearer ' + access_token },
 		form: {
 		},
 		json: true
 	};
 
-	console.log('https://api.spotify.com/v1/users/'+ user_id +'/playlists/' + playlist_id + '/tracks/?'+
-		querystring.stringify({
-			'fields' : fields
-		}));
 	request.get(authOptions, function(error, response, body) {
 		if (!error && response.statusCode === 200) {
 			res.send(body);
@@ -270,8 +267,8 @@ app.get('/getPlaylist',function(req, res){
 	var playlist_id = req.query.playlist_id;
 	var fields = req.query.fields;
 
-	console.log(user_id);
-	console.log(playlist_id);
+	//console.log(user_id);
+	//console.log(playlist_id);
 	var authOptions = {
 		url: 'https://api.spotify.com/v1/users/'+ user_id +'/playlists/' + playlist_id + +
 			querystring.stringify({
@@ -374,8 +371,8 @@ app.get('/getPlaylistFull',function(req, res){
 	var user_id = req.query.user_id;
 	var playlist_id = req.query.playlist_id;
 	var fields = req.query.fields;
-	console.log(user_id);
-	console.log(playlist_id);
+	//console.log(user_id);
+	//console.log(playlist_id);
 	var authOptions = {
 		url: 'https://api.spotify.com/v1/users/' + user_id + '/playlists/' + playlist_id + '?fields=' + fields,
 		headers: { 'Authorization': 'Bearer ' + access_token },
@@ -383,17 +380,17 @@ app.get('/getPlaylistFull',function(req, res){
 		},
 		json: true
 	};
-	console.log("HARO")
+	//console.log("HARO")
 	request.get(authOptions, function(error, response, body) {
 		if (!error && response.statusCode === 200) {
-			console.log(body)
+			//console.log(body)
 			/*res.send({
 				'followers': body.followers.total
 			});*/
 			res.send(body);
 		}
 	});
-	console.log("BYE BYE")
+	//console.log("BYE BYE")
 });
 
 app.get('/getUserInfo',function(req, res){

@@ -85,7 +85,7 @@ $.ajax({
 				info.push(features[it].instrumentalness);
 				info.push(features[it].liveness);
 				info.push(features[it].valence);
-				info.push(features[it].tempo);
+				info.push(features[it].tempo);/
 				info.push(features[it].duration_ms);
 				info.push(features[it].time_signature);
 

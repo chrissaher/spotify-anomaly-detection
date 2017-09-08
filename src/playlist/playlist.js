@@ -77,8 +77,9 @@ class Controller {
 	track_multi_analysis(acc_token, user_id, playlist_id) {
 
 		var next = "";
+		var totalItems = -1;
 		var map = new Map();
-		var sTrackIds = "";
+		var jsonData = "id,danceability,energy,key,loudness,mode,speechiness,acousticness,instrumentalness,liveness,valence,tempo,duration_ms,time_signature\r\n";
 		while(next != null) {
 			$.ajax({
 				url: '/getPlaylistTracks',
@@ -93,17 +94,97 @@ class Controller {
 				},
 				async: false
 			}).done(function(data) {
+				if(totalItems < 0) {
+					totalItems = data.total;
+				}
+				var nItems = 0;
+				var sTrackIds = "";
 				next = data.next;
 
 				for(var it in data.items) {
 					var curr = data.items[it].track;
-					map.set(curr.id, curr.name);
+					if(map.get(curr.id)) {
+						totalItems--;
+					} else {
+						map.set(curr.id, curr.name);
+					}
 					sTrackIds = sTrackIds + curr.id + ","
+					nItems++;
 				}
 
-				if(data.total >= map.size) {
+				/*if(data.total <= map.size) {
 					alert("Reached Total: " + map.size )
-				}
+				}*/
+
+				$.ajax({
+					url: '/getMultiAnalysis',
+					data: {
+						'access_token': acc_token,
+						'trackIds': sTrackIds
+					},
+					async: false
+				}).done(function(analysis) {
+					var fItems = 0;
+					for(var it in analysis.audio_features) {
+						var feature = analysis.audio_features[it];
+						if(feature != null) {
+							var sRow = "";
+							sRow += feature.id + ",";
+							sRow += feature.danceability + ",";
+							sRow += feature.energy + ",";
+							sRow += feature.key + ",";
+							sRow += feature.loudness + ",";
+							sRow += feature.mode + ",";
+							sRow += feature.speechiness + ",";
+							sRow += feature.acousticness + ",";
+							sRow += feature.instrumentalness + ",";
+							sRow += feature.liveness + ",";
+							sRow += feature.valence + ",";
+							sRow += feature.tempo + ",";
+							sRow += feature.duration_ms + ",";
+							sRow += feature.time_signature;
+
+							jsonData += (sRow + "\r\n");
+						}
+						fItems++;
+					}
+
+					if(fItems == nItems) {
+						if(totalItems <= map.size) {
+							if(nItems == 1) {
+								var displayData = document.getElementById('JSONDATA');
+								displayData.innerHTML = "Too few elements to analyse playlist";
+							} else {
+								$.ajax({
+										url: 'http://127.0.0.1:8080/',
+										method: 'POST',
+										contentType: 'application/x-www-form-urlencoded',
+										data : {
+											'data': jsonData,
+										},
+										success: (data) => {
+											var arr = data.split(",");
+											var res = "";
+											for(var it in arr){
+												var key = arr[it];
+												if(key != null && key != "") {
+													res = res + map.get(arr[it]) + "</br>";
+												}
+											}
+											if(res == "") {
+												res = "No anomalies founded."
+											}
+											var displayData = document.getElementById('JSONDATA');
+											//displayData.innerHTML = jsonData;
+											displayData.innerHTML = res;
+										}
+								});
+							}
+						}
+					}
+
+
+				});
 			});
 		}
 
@@ -153,18 +234,15 @@ class Controller {
 									'followers.total,' +
 									'images.items(url),'
 					}
-				}).done(function(data2) {
+				}).done(function(playlist) {
 
 					var current = template.replace("#It", idx);
-					current = current.replace("#Name", data2.name);
-					current = current.replace("#URL", data2.external_urls.spotify);
-					current = current.replace("#OwnerName", data2.owner.display_name || data2.owner.id);
-					if(data2.owner != null) {
-						var userImg = document.getElementById('user_image');
-						//userImg.src = data.user_image;
-					}
-					current = current.replace("#OwnerId", data2.owner.id);
-					if (data2.collaborative == true) {
+					current = current.replace("#Name", playlist.name);
+					current = current.replace("#URL", playlist.external_urls.spotify);
+					current = current.replace("#OwnerName", playlist.owner.display_name || playlist.owner.id);
+
+					current = current.replace("#OwnerId", playlist.owner.id);
+					if (playlist.collaborative == true) {
 						current = current.replace("#CollaborativeStyle", "text-success");
 						current = current.replace("#sCollaborative", "Collaborative");
 					}
@@ -172,20 +250,20 @@ class Controller {
 						current = current.replace("#CollaborativeStyle", "text-danger");
 						current = current.replace("#sCollaborative", "Not Collaborative");
 					}
-					current = current.replace("#Tipe", (data2.public == true)? "Public": "Private");
-					current = current.replace("#GETID", data2.id);
-					current = current.replace("#DataUser", data2.owner.id);
-					current = current.replace("#DataPlaylist", data2.id);
-					//current = current.replace("#OwnerImg", data2.images[1].url);
+					current = current.replace("#Tipe", (playlist.public == true)? "Public": "Private");
+					current = current.replace("#GETID", playlist.id);
+					current = current.replace("#DataUser", playlist.owner.id);
+					current = current.replace("#DataPlaylist", playlist.id);
+					//current = current.replace("#OwnerImg", playlist.images[1].url);
 
 
-					current = current.replace("#Followers", data2.followers.total);
+					current = current.replace("#Followers", playlist.followers.total);
 
 					$.ajax({
 						url: '/getUserInfo',
 						data: {
 							'access_token': acc_token,
-							'user_id': data2.owner.id
+							'user_id': playlist.owner.id
 						},
 						async: false
 					}).done(function(UserInfo) {
@@ -197,14 +275,14 @@ class Controller {
 					});
 
 					myTable.insertAdjacentHTML( 'beforeend', current );
-					var current_get = document.getElementById(data2.id);
+					var current_get = document.getElementById(playlist.id);
 					current_get.onclick = function(){
 						var c = new Controller();
 						c.track_multi_analysis(acc_token, this.getAttribute("data-user"), this.getAttribute("data-playlist"));
 					};
 
 					var c = $("#lstPlaylist tr").length;
-					if(c == self.total % self.limit){
+					if(c == self.total % self.limit || c == self.limit){
 						//alert("FIN")
 						$("#playlist_loader").hide();
 						$("#playlist_table").show();
@@ -305,8 +383,8 @@ $(() => {
 	}
 
 	var controller = new Controller();
-	self.limit = 20;
-	self.offset = 0;
+	self.limit = 5;
+	self.offset = 10;
 	self.total = 0;
 	var btnPrev = document.getElementById("prev");
 	btnPrev.onclick = function(){
