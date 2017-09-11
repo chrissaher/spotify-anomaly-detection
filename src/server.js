@@ -7,6 +7,7 @@
  * https://developer.spotify.com/web-api/authorization-guide/#authorization_code_flow
  */
 
+
 var express = require('express'); // Express web server framework
 var request = require('request'); // "Request" library
 var querystring = require('querystring');
@@ -241,11 +242,11 @@ app.get('/getPlaylistTracks',function(req, res){
 			});
 	}
 
-	console.log("PARAMETERS")
-	console.log(user_id);
-	console.log(playlist_id);
-	console.log(url)
-	console.log("END")
+	//console.log("PARAMETERS")
+	//console.log(user_id);
+	//console.log(playlist_id);
+	//console.log(url)
+	//console.log("END")
 	var authOptions = {
 		url: url,
 		headers: { 'Authorization': 'Bearer ' + access_token },
