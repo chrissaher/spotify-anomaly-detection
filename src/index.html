@@ -40,9 +40,9 @@
 			$("#showpopup").click(() => {
 				spotifyLoginWindow = window.open('/login','MyWindow',width=600,height=300);
 				spotifyLoginWindow.onbeforeunload = function() {
-				  var accessToken = localStorage.getItem('sp-accessToken');
-				  var refreshToken = localStorage.getItem('sp-refreshToken');
-				  var error = localStorage.getItem('sp-error');
+				  var accessToken = null;//localStorage.getItem('sp-accessToken');
+				  var refreshToken = null; //localStorage.getItem('sp-refreshToken');
+				  var error = null; //localStorage.getItem('sp-error');
 				  alert(accessToken)
 				  $.get(
 					    "/dashboard",

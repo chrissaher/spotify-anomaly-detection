@@ -346,9 +346,9 @@ $(() => {
 		var access_token = params.access_token,
 			refresh_token = params.refresh_token,
 			error = params.error;
-		localStorage.setItem('sp-accessToken', access_token);
-		localStorage.setItem('sp-refreshToken', refresh_token);
-		localStorage.setItem('sp-error', error);
+		//localStorage.setItem('sp-accessToken', access_token);
+		//localStorage.setItem('sp-refreshToken', refresh_token);
+		//localStorage.setItem('sp-error', error);
 		//window.close()
 	} else if (window.top !== window.self) {
 	    //alert('inside an iframe');
@@ -384,7 +384,7 @@ $(() => {
 
 	var controller = new Controller();
 	self.limit = 5;
-	self.offset = 10;
+	self.offset = 0;
 	self.total = 0;
 	var btnPrev = document.getElementById("prev");
 	btnPrev.onclick = function(){

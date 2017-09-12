@@ -7,16 +7,17 @@
  * https://developer.spotify.com/web-api/authorization-guide/#authorization_code_flow
  */
 
-
+'use strict';
 var express = require('express'); // Express web server framework
 var request = require('request'); // "Request" library
 var querystring = require('querystring');
 var cookieParser = require('cookie-parser');
-var localStorage = require('localStorage')
+
 
 var client_id = 'a7f084730c164961a78208b6f4dfa2fa'; // Your client id
 var client_secret = '370de42f69324fbabe5c90aeade386fc'; // Your secret
-var redirect_uri = 'http://localhost:8889/demo'; // Your redirect uri
+var redirect_uri = 'http://192.168.99.100:8889/demo'; // Your redirect uri
+//var redirect_uri = 'http://' + ip.address() +':8889/demo';
 
 /**
  * Generates a random string containing numbers and letters
@@ -175,8 +176,8 @@ app.get('/demo', function(req, res) {
 
 				var access_token = body.access_token,
 					refresh_token = body.refresh_token;
-				localStorage.setItem('sp-accessToken', access_token);
-				localStorage.setItem('sp-refreshToken', refresh_token);
+				//localStorage.setItem('sp-accessToken', access_token);
+				//localStorage.setItem('sp-refreshToken', refresh_token);
 				var options = {
 					url: 'https://api.spotify.com/v1/me',
 					headers: { 'Authorization': 'Bearer ' + access_token },
