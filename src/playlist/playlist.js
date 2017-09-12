@@ -18,62 +18,6 @@ class Controller {
 		});
 	}
 
-	info_playlist(acc_token) {
-		$.ajax({
-			url: '/getPlaylist',
-			data: {
-				'access_token': acc_token
-			}
-		}).done(function(data) {
-			var resultIdPlaceholder = document.getElementById('resultId');
-			resultIdPlaceholder.innerHTML = data.tracks.items[0].track.id;
-
-			var resultNamePlaceholder = document.getElementById('resultName');
-			resultNamePlaceholder.innerHTML = JSON.stringify(data.tracks.items[0].track.name);
-		});
-	}
-
-	track_analysis(acc_token) {
-		var trackId = $("#trackid")[0].value;
-		$.ajax({
-			url: '/getAnalysis',
-			data: {
-				'access_token': acc_token,
-				'trackId': trackId
-			}
-		}).done(function(data) {
-			var info = [
-				0,
-				data.id,
-				"Name",
-				data.danceability,
-				data.energy,
-				data.key,
-				data.loudness,
-				data.mode,
-				data.speechiness,
-				data.acousticness,
-				data.instrumentalness,
-				data.liveness,
-				data.valence,
-				data.tempo,
-				data.duration_ms,
-				data.time_signature
-			];
-
-			$("#info_body tr").remove();
-			var tableRef = document.getElementById('info').getElementsByTagName('tbody')[0];
-			var newRow   = tableRef.insertRow(tableRef.rows.length);
-
-			for(var i = 0; i < 16; ++i) {
-				var cell = newRow.insertCell(i);
-				cell.appendChild(document.createTextNode(info[i]));
-			}
-			//var resultAnalysis = document.getElementById('resultAnalysis');
-			//resultAnalysis.innerHTML = JSON.stringify(data);
-		});
-	}
-
 	track_multi_analysis(acc_token, user_id, playlist_id) {
 
 		var next = "";
@@ -111,10 +55,6 @@ class Controller {
 					sTrackIds = sTrackIds + curr.id + ","
 					nItems++;
 				}
-
-				/*if(data.total <= map.size) {
-					alert("Reached Total: " + map.size )
-				}*/
 
 				$.ajax({
 					url: '/getMultiAnalysis',
@@ -156,7 +96,7 @@ class Controller {
 								displayData.innerHTML = "Too few elements to analyse playlist";
 							} else {
 								$.ajax({
-										url: 'http://127.0.0.1:8080/',
+										url: 'http://192.168.99.100:8080/',
 										method: 'POST',
 										contentType: 'application/x-www-form-urlencoded',
 										data : {
@@ -175,7 +115,6 @@ class Controller {
 												res = "No anomalies founded."
 											}
 											var displayData = document.getElementById('JSONDATA');
-											//displayData.innerHTML = jsonData;
 											displayData.innerHTML = res;
 										}
 								});
@@ -210,11 +149,9 @@ class Controller {
 
 			var template = '<tr> <td class="v-a-m">#It </td> <td class="v-a-m"><a href = "#URL"><span class="text-white">#Name</span></a> <br> <span>Followers: #Followers</span> </td> <td class="v-a-m"> <div class="media media-auto"> <div class="media-left"> <div class="avatar"> <img class="media-object img-circle" src="#OwnerImg" alt="Avatar"> </div> </div> <div class="media-body"> <span class="media-heading text-white">#OwnerName</span> <br> <span class="media-heading"><span>Spotify id: #OwnerId</span></span> </div> </div> </td> <td class="v-a-m"><span>#Tipe</span> <br> <span class="#CollaborativeStyle">#sCollaborative</span> </td> <td class="text-right v-a-m"> <a  id ="#GETID" data-user = "#DataUser" data-playlist = "#DataPlaylist" type="button" class="btn btn-default">Analyze</a> </td> </tr>';
 			var items = data.items
-			//var tableRef = document.getElementById('playlist').getElementsByTagName('tbody')[0];
 			var myTable = document.getElementById('lstPlaylist');
 			var idx = 1;
 			for(var it in items) {
-			//for(var it = 0; it < 1; ++it) {
 				var item = items[it];
 
 				$.ajax({
@@ -254,8 +191,6 @@ class Controller {
 					current = current.replace("#GETID", playlist.id);
 					current = current.replace("#DataUser", playlist.owner.id);
 					current = current.replace("#DataPlaylist", playlist.id);
-					//current = current.replace("#OwnerImg", playlist.images[1].url);
-
 
 					current = current.replace("#Followers", playlist.followers.total);
 
@@ -283,7 +218,6 @@ class Controller {
 
 					var c = $("#lstPlaylist tr").length;
 					if(c == self.total % self.limit || c == self.limit){
-						//alert("FIN")
 						$("#playlist_loader").hide();
 						$("#playlist_table").show();
 					}
@@ -341,42 +275,23 @@ $(() => {
 	}
 
 	if (window.opener) {
-	    alert('inside a pop-up window or target=_blank window');
-		var params = getHashParams();
-		var access_token = params.access_token,
-			refresh_token = params.refresh_token,
-			error = params.error;
-		//localStorage.setItem('sp-accessToken', access_token);
-		//localStorage.setItem('sp-refreshToken', refresh_token);
-		//localStorage.setItem('sp-error', error);
-		//window.close()
+		//alert('inside a pop-up window or target=_blank window');
 	} else if (window.top !== window.self) {
 	    //alert('inside an iframe');
 	} else {
 	    //alert('this is a top level window');
 	}
-/*
-	var oauthSource = document.getElementById('oauth-template').innerHTML,
-		oauthTemplate = Handlebars.compile(oauthSource),
-		oauthPlaceholder = document.getElementById('oauth');*/
 
 	var params = getHashParams();
 
 	var access_token = params.access_token,
 		refresh_token = params.refresh_token,
-		error = null;
+		error = params.error;
 
 	if (error) {
 		alert('There was an error during the authentication');
 	} else {
-		if (access_token) {
-			// render oauth info
-		/*	oauthPlaceholder.innerHTML = oauthTemplate({
-				access_token: access_token,
-				refresh_token: refresh_token
-			});*/
-
-		} else {
+		if (access_token == null) {
 				// render initial screen
 				alert("NO PERMISSION");
 		}
@@ -413,21 +328,8 @@ $(() => {
 
 	controller.my_info(access_token);
 	controller.my_playlist(access_token, self.limit, self.offset);
-
+	/*
 	$('#obtain-new-token').click(() => {
 		controller.refresh_token(access_token, refresh_token);
-		//controller.info_playlist(access_token);
-	});
-
-	$('#analysis').click(() => {
-		controller.track_multi_analysis(access_token);
-	});
-
-	$('#analysis_track').click(() => {
-		controller.track_analysis(access_token);
-	});
-
-	$('#my_playlist').click(() => {
-		controller.my_playlist(access_token, 5, 0);
-	});
+	});*/
 });
