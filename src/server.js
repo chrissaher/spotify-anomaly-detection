@@ -283,5 +283,5 @@ app.get('/getCurrentUserInfo',function(req, res){
 
 });
 
-console.log('Listening on 8889');
-app.listen(80);
+console.log('Listening on 5000');
+app.listen(5000);
