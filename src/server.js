@@ -284,4 +284,4 @@ app.get('/getCurrentUserInfo',function(req, res){
 });
 
 console.log('Listening on 8889');
-app.listen(8889);
+app.listen(80);
