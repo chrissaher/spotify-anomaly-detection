@@ -283,5 +283,9 @@ app.get('/getCurrentUserInfo',function(req, res){
 
 });
 
-console.log('Listening on 8080');
-app.listen(8080);
+app.set('port', (process.env.PORT || 8889));
+//console.log('Listening on ' + app.get('port'));
+app.listen(app.get('port'), function() {
+  console.log('Node app is running on port', app.get('port'));
+});
+//app.listen(8080);
