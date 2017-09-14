@@ -1,0 +1,10 @@
+services:
+  web:
+    image: chrissaher/anomaly-detection
+    ports:
+      - "8889:8889"
+
+  webservice:
+    image: chrissaher/anomaly-detection
+    ports:
+      - "8080:8080"
