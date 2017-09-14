@@ -7,7 +7,7 @@ var cookieParser = require('cookie-parser');
 
 var client_id = 'a7f084730c164961a78208b6f4dfa2fa';
 var client_secret = '370de42f69324fbabe5c90aeade386fc';
-var redirect_uri = 'http://192.168.99.100:8889/demo';
+var redirect_uri = 'http://localhost/demo';
 
 var generateRandomString = function(length) {
 	var text = '';
@@ -283,5 +283,7 @@ app.get('/getCurrentUserInfo',function(req, res){
 
 });
 
-console.log('Listening on 8889');
-app.listen(8889);
+app.set('port', (process.env.PORT || 8889));
+app.listen(app.get('port'), function() {
+  console.log('Node app is running on port', app.get('port'));
+});

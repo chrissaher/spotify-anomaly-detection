@@ -1,11 +1,13 @@
 import cherrypy
 import cherrypy_cors
 import json
+import os
 from anomalydetector import AnomalyDetector
 
+port = int(os.environ.get("PORT", 8080))
 cherrypy.config.update({
-	'server.socket_host': '0.0.0.0',
-	'server.socket_port': 8080,
+	'server.socket_host': '0.0.0.0/ws',
+	'server.socket_port': port,
 })
 
 @cherrypy.expose
