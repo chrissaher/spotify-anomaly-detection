@@ -1,3 +1,4 @@
+# Base image
 FROM ubuntu:latest
 
 # Initial necessary software for next instalations
