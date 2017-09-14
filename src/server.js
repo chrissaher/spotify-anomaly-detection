@@ -283,5 +283,5 @@ app.get('/getCurrentUserInfo',function(req, res){
 
 });
 
-console.log('Listening on 80');
-app.listen(80);
+console.log('Listening on 8080');
+app.listen(8080);
