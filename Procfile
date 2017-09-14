@@ -1,1 +1,1 @@
-web: python src/ws/webservice.py
+web: npm start &; python src/ws/webservice.py

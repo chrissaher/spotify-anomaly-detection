@@ -33,7 +33,7 @@ if __name__ == '__main__':
 			'tools.response_headers.headers': [('Content-Type', 'text/plain')],
 		}
 	}
-	cherrypy.quickstart(AnomalyDetectorWS(), '/', conf)
+	cherrypy.quickstart(AnomalyDetectorWS(), '/ws', conf)
 
 #https://hub.docker.com/_/python/
 #https://nodejs.org/en/download/package-manager/#debian-and-ubuntu-based-linux-distributions

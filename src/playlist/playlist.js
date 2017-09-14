@@ -96,7 +96,7 @@ class Controller {
 								displayData.innerHTML = "Too few elements to analyse playlist";
 							} else {
 								$.ajax({
-										url: 'http://localhost/',
+										url: 'http://localhost/ws',
 										method: 'POST',
 										contentType: 'application/x-www-form-urlencoded',
 										data : {
