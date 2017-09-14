@@ -1,6 +1,0 @@
-cherrypy
-cherrypy_cors
-numpy
-scipy
-pandas
-scikit-learn
