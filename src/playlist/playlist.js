@@ -96,7 +96,7 @@ class Controller {
 								displayData.innerHTML = "Too few elements to analyse playlist";
 							} else {
 								$.ajax({
-										url: 'http://192.168.99.100:8080/',
+										url: 'https://anomaly-detection-ws.herokuapp.com/',
 										method: 'POST',
 										contentType: 'application/x-www-form-urlencoded',
 										data : {
