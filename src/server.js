@@ -283,5 +283,5 @@ app.get('/getCurrentUserInfo',function(req, res){
 
 });
 
-console.log('Listening on 443');
-app.listen(443);
+console.log('Listening on 80');
+app.listen(80);
