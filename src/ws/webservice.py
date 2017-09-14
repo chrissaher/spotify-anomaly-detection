@@ -7,7 +7,7 @@ from anomalydetector import AnomalyDetector
 port = int(os.environ.get("PORT", 5000))
 cherrypy.config.update({
 	'server.socket_host': '0.0.0.0',
-	'server.socket_port': str(port),
+	'server.socket_port': port,
 })
 
 @cherrypy.expose
