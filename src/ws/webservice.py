@@ -6,7 +6,7 @@ from anomalydetector import AnomalyDetector
 
 port = int(os.environ.get("PORT", 8080))
 cherrypy.config.update({
-	'server.socket_host': '0.0.0.0/ws',
+	'server.socket_host': '0.0.0.0',
 	'server.socket_port': port,
 })
 
